@@ -1,6 +1,7 @@
-const { calcularDesconto } = require("../src/calcularDesconto");
+const { calcularDesconto, calcularAcrescimo } = require("../src/calcularDesconto");
 
 describe("calcularDesconto", () => {
+  // Testes existentes para calcularDesconto
   test("aplica o desconto", () => {
     expect(calcularDesconto(100, 20)).toBe(80);
   });
@@ -20,8 +21,34 @@ describe("calcularDesconto", () => {
   });
 
   test("rejeita entradas que não são números finitos", () => {
-    expect(() => calcularDesconto("100", 20)).toThrow();
-    expect(() => calcularDesconto(100, NaN)).toThrow();
-    expect(() => calcularDesconto(Infinity, 20)).toThrow();
+    expect(() => calcularDesconto("100", 20)).toThrow("Entrada inválida");
+    expect(() => calcularDesconto(100, NaN)).toThrow("Entrada inválida");
+    expect(() => calcularDesconto(Infinity, 20)).toThrow("Entrada inválida");
+  });
+});
+
+describe("calcularAcrescimo", () => {
+  test("aplica o acréscimo", () => {
+    expect(calcularAcrescimo(100, 20)).toBe(120);
+  });
+
+  test("aceita as bordas de 0% e 100%", () => {
+    expect(calcularAcrescimo(50, 0)).toBe(50);
+    expect(calcularAcrescimo(50, 100)).toBe(100);
+  });
+
+  test("rejeita valor negativo", () => {
+    expect(() => calcularAcrescimo(-1, 20)).toThrow("Valor negativo");
+  });
+
+  test("rejeita percentual fora do intervalo", () => {
+    expect(() => calcularAcrescimo(100, -1)).toThrow("Percentual inválido");
+    expect(() => calcularAcrescimo(100, 101)).toThrow("Percentual inválido");
+  });
+
+  test("rejeita entradas que não são números finitos", () => {
+    expect(() => calcularAcrescimo("100", 20)).toThrow("Entrada inválida");
+    expect(() => calcularAcrescimo(100, NaN)).toThrow("Entrada inválida");
+    expect(() => calcularAcrescimo(Infinity, 20)).toThrow("Entrada inválida");
   });
 });

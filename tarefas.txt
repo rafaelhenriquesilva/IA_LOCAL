@@ -1,16 +1,14 @@
-TAREFA: Validar entradas de calcularDesconto
+ID: CALC-002
+PROJETO: calculator
 
-PROJETO: ./calculator
+TAREFA:
+Adicionar uma função calcularAcrescimo ao módulo src/calcularDesconto.js.
 
-PROBLEMA:
-A função aceita strings, NaN e Infinity e pode retornar resultados incorretos.
-
-CRITÉRIOS DE ACEITAÇÃO:
-- preco e percentual devem ser números finitos.
-- preco não pode ser negativo.
-- percentual deve estar entre 0 e 100, inclusive.
-- preservar os casos válidos existentes.
-- todos os testes Jest devem passar.
-
-COMANDO DE VERIFICAÇÃO:
-npm test
+CRITÉRIOS:
+- Receber valor e percentual.
+- Rejeitar entradas que não sejam números finitos.
+- Rejeitar valor negativo.
+- Aceitar percentual entre 0 e 100, inclusive.
+- Retornar o valor após aplicar o acréscimo.
+- Preservar calcularDesconto e seus testes.
+- Criar testes Jest para a nova função.
