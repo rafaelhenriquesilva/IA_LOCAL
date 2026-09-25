@@ -1,0 +1,16 @@
+TAREFA: Validar entradas de calcularDesconto
+
+PROJETO: ./calculator
+
+PROBLEMA:
+A função aceita strings, NaN e Infinity e pode retornar resultados incorretos.
+
+CRITÉRIOS DE ACEITAÇÃO:
+- preco e percentual devem ser números finitos.
+- preco não pode ser negativo.
+- percentual deve estar entre 0 e 100, inclusive.
+- preservar os casos válidos existentes.
+- todos os testes Jest devem passar.
+
+COMANDO DE VERIFICAÇÃO:
+npm test
