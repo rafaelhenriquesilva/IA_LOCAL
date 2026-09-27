@@ -1,14 +1,20 @@
-ID: CALC-002
+ID: CALC-003
 PROJETO: calculator
 
 TAREFA:
-Adicionar uma função calcularAcrescimo ao módulo src/calcularDesconto.js.
+Adicionar a função calcularDescontoEmCentavos em src/calcularDesconto.js.
 
-CRITÉRIOS:
-- Receber valor e percentual.
-- Rejeitar entradas que não sejam números finitos.
-- Rejeitar valor negativo.
-- Aceitar percentual entre 0 e 100, inclusive.
-- Retornar o valor após aplicar o acréscimo.
-- Preservar calcularDesconto e seus testes.
-- Criar testes Jest para a nova função.
+CONTRATO:
+- precoEmCentavos deve ser um número inteiro maior ou igual a zero.
+- percentual deve ser um número finito entre 0 e 100.
+- O resultado deve ser um número inteiro de centavos.
+- Arredondar o resultado final com Math.round.
+- Preservar calcularDesconto e calcularAcrescimo.
+
+TESTES:
+- 10000 centavos com 20% de desconto retorna 8000.
+- 999 centavos com 50% de desconto retorna 500.
+- 0% mantém o valor; 100% retorna zero.
+- Rejeitar centavos fracionários, negativos, strings, NaN e Infinity.
+- Rejeitar percentuais fora do intervalo e não finitos.
+- Todos os testes Jest existentes devem continuar passando.

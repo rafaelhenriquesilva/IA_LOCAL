@@ -1,4 +1,4 @@
-const { calcularDesconto, calcularAcrescimo } = require("../src/calcularDesconto");
+const { calcularDesconto, calcularAcrescimo, calcularDescontoEmCentavos } = require("../src/calcularDesconto");
 
 describe("calcularDesconto", () => {
   // Testes existentes para calcularDesconto
@@ -50,5 +50,35 @@ describe("calcularAcrescimo", () => {
     expect(() => calcularAcrescimo("100", 20)).toThrow("Entrada inválida");
     expect(() => calcularAcrescimo(100, NaN)).toThrow("Entrada inválida");
     expect(() => calcularAcrescimo(Infinity, 20)).toThrow("Entrada inválida");
+  });
+});
+
+describe("calcularDescontoEmCentavos", () => {
+  test("10000 centavos com 20% de desconto retorna 8000", () => {
+    expect(calcularDescontoEmCentavos(10000, 20)).toBe(8000);
+  });
+
+  test("999 centavos com 50% de desconto retorna 500", () => {
+    expect(calcularDescontoEmCentavos(999, 50)).toBe(500);
+  });
+
+  test("0% mantém o valor; 100% retorna zero", () => {
+    expect(calcularDescontoEmCentavos(500, 0)).toBe(500);
+    expect(calcularDescontoEmCentavos(500, 100)).toBe(0);
+  });
+
+  test("rejeita centavos fracionários, negativos, strings, NaN e Infinity", () => {
+    expect(() => calcularDescontoEmCentavos(100.5, 20)).toThrow("Preço em centavos deve ser um número inteiro");
+    expect(() => calcularDescontoEmCentavos(-100, 20)).toThrow("Preço negativo");
+    expect(() => calcularDescontoEmCentavos("100", 20)).toThrow("Entrada inválida");
+    expect(() => calcularDescontoEmCentavos(NaN, 20)).toThrow("Entrada inválida");
+    expect(() => calcularDescontoEmCentavos(Infinity, 20)).toThrow("Entrada inválida");
+  });
+
+  test("rejeita percentuais fora do intervalo e não finitos", () => {
+    expect(() => calcularDescontoEmCentavos(100, -1)).toThrow("Percentual inválido");
+    expect(() => calcularDescontoEmCentavos(100, 101)).toThrow("Percentual inválido");
+    expect(() => calcularDescontoEmCentavos(100, NaN)).toThrow("Entrada inválida");
+    expect(() => calcularDescontoEmCentavos(100, Infinity)).toThrow("Entrada inválida");
   });
 });
