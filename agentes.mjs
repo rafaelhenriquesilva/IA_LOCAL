@@ -75,9 +75,11 @@ async function consultarAgente(nome, instrucao, entrada, json = false) {
       model: MODELO,
       stream: true,
       ...(json ? { format: ESQUEMA_PROPOSTA } : {}),
+      think: false,
       options: {
         temperature: 0,
         num_ctx: 8192,
+        num_predict: nome === "Planejador" ? 350 : 4096,
       },
       messages: [
         { role: "system", content: instrucao },
@@ -151,10 +153,10 @@ const tarefa = await readFile(
   "utf8",
 );
 
-if (!tarefa.includes("ID: CALC-002")) {
-  throw new Error(
-    "tarefas.txt não contém a CALC-002. Nenhum arquivo foi alterado.",
-  );
+const idTarefa = tarefa.match(/^ID:\s*([A-Z]+-\d+)\s*$/m)?.[1];
+
+if (!idTarefa) {
+  throw new Error("tarefas.txt precisa de uma linha como: ID: CALC-003");
 }
 
 const arquivosPermitidos = new Map([
@@ -202,7 +204,8 @@ const plano = await consultarAgente(
 O projeto usa CommonJS e Jest.
 Planeje a implementação da tarefa e os casos de teste.
 Preserve a função calcularDesconto.
-Não afirme ter executado comandos.`,
+Não afirme ter executado comandos.
+Responda em no máximo 8 linhas. Não escreva código; forneça apenas o plano.`,
   contexto,
 );
 
@@ -227,8 +230,9 @@ Responda SOMENTE com JSON válido neste formato:
 Regras:
 - Retorne exatamente esses dois arquivos.
 - Cada conteudo deve conter o arquivo inteiro.
-- Preserve CommonJS, Jest e todos os testes existentes.
-- Acrescente testes para calcularAcrescimo.
+- Preserve CommonJS, Jest e as funcionalidades existentes.
+- Implemente os critérios da TAREFA recebida.
+- Acrescente testes Jest específicos para a nova funcionalidade.
 - Não inclua Markdown fora do JSON.
 - Não afirme ter executado os testes.`,
   `${contexto}\n\nPLANO:\n${plano}`,
@@ -300,7 +304,7 @@ const revisao = await consultarAgente(
   "Revisor",
   `Você é um revisor de código rigoroso.
 Compare tarefa, arquivos anteriores, arquivos aplicados e resultado posterior do Jest.
-Verifique se calcularDesconto foi preservada e se os novos testes cobrem calcularAcrescimo.
+Verifique se as funcionalidades anteriores foram preservadas e se os novos testes cobrem os critérios da tarefa.
 Separe problemas obrigatórios de sugestões opcionais.
 Recomende aprovação ou correção com justificativa concreta.
 Não afirme ter executado comandos.`,
@@ -321,7 +325,7 @@ const pastaExecucoes = new URL("./execucoes/", import.meta.url);
 await mkdir(pastaExecucoes, { recursive: true });
 
 const registro = {
-  idTarefa: "CALC-002",
+  idTarefa,
   modelo: MODELO,
   concluidoEm: new Date().toISOString(),
   arquivosAlterados: [...caminhosRecebidos],
@@ -331,7 +335,7 @@ const registro = {
   revisao,
 };
 
-const nomeRegistro = `CALC-002-${Date.now()}.json`;
+const nomeRegistro = `${idTarefa}-${Date.now()}.json`;
 
 await writeFile(
   new URL(nomeRegistro, pastaExecucoes),
@@ -344,3 +348,4 @@ console.log(`Jest antes: ${registro.jestAntes}`);
 console.log(`Jest depois: ${registro.jestDepois}`);
 console.log(`Registro: execucoes/${nomeRegistro}`);
 console.log("Revise o diff antes de fazer commit.");
+if (!depois.passou) process.exitCode = 1;
