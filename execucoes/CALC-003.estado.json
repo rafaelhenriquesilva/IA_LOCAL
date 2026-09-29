@@ -1,7 +1,9 @@
 {
   "id": "CALC-003",
-  "status": "aguardando_revisao",
+  "status": "aprovada",
   "iniciadoEm": "2026-09-27T02:56:38.883Z",
   "finalizadoEm": "2026-09-27T03:10:51.683Z",
-  "codigoSaida": 0
+  "codigoSaida": 0,
+  "revisadoEm": "2026-09-29T18:35:56.242Z",
+  "registroRevisado": "CALC-003-1790478651673.json"
 }
