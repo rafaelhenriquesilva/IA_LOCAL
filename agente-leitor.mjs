@@ -1,7 +1,7 @@
 /*
 node .\agente-leitor.mjs "Execute os testes do projeto e informe se passaram, quantos testes foram executados e quais falharam."
 node .\agente-leitor.mjs "Adicione comentários JSDoc às três funções de src/calcularDesconto.js, documentando parâmetros, retorno e erros conforme a implementação atual. Preserve o comportamento e os exports. Leia o código e os testes, execute Jest antes e depois da alteração."
-
+node .\agente-leitor.mjs --exigir-escrita "Atualize o JSDoc de calcularDescontoEmCentavos: documente centavos inteiros, finitos e não negativos, percentual finito entre 0 e 100 e retorno inteiro arredondado com Math.round. Aplique a alteração usando escrever_arquivo. Preserve o comportamento e os exports."
 */
 import { ferramentas, executarFerramenta } from "./lib/ferramentas.mjs";
 
@@ -12,8 +12,11 @@ const MAXIMO_ESCRITAS = 2;
 let escritasRealizadas = 0;
 const arquivosLidos = new Set();
 let testesIniciaisPassaram = false;
+const EXIGIR_ESCRITA = process.argv.includes("--exigir-escrita");
 const pergunta =
-  process.argv.slice(2).join(" ") ||
+  process.argv.slice(2)
+    .filter((argumento) => argumento !== "--exigir-escrita")
+    .join(" ") ||
   "Leia src/calcularDesconto.js e explique as funções existentes.";
 
 const mensagens = [
@@ -96,6 +99,24 @@ async function main() {
         throw new Error("O modelo terminou sem resposta.");
       }
 
+      if (EXIGIR_ESCRITA && escritasRealizadas === 0) {
+        console.log(
+          "\nO modelo respondeu sem aplicar a alteração. Solicitando execução...",
+        );
+
+        mensagens.push({
+          role: "user",
+          content:
+            "A tarefa exige uma alteração aplicada no arquivo. " +
+            "Você ainda não executou escrever_arquivo. " +
+            "Leia o código e os testes, execute Jest e use escrever_arquivo " +
+            "para aplicar a alteração. Apenas mostrar código na resposta " +
+            "não conclui a tarefa.",
+        });
+
+        continue;
+      }
+
       console.log(`\n${mensagem.content}`);
 
       if (escritasRealizadas > 0) {
@@ -135,57 +156,57 @@ async function main() {
       let retorno;
 
       try {
-        if (
-          nome === "escrever_arquivo" &&
-          escritasRealizadas >= MAXIMO_ESCRITAS
-        ) {
-          throw new Error(
-            "Limite de duas escritas atingido. Encerre e explique o resultado.",
-          );
-        }
+  if (nome === "escrever_arquivo") {
+    if (escritasRealizadas >= MAXIMO_ESCRITAS) {
+      throw new Error("Limite de duas escritas atingido.");
+    }
 
-        const resultado = await executarFerramenta(nome, argumentos);
+    const arquivosObrigatorios = [
+      "src/calcularDesconto.js",
+      "tests/calcularDesconto.test.js",
+    ];
 
-        if (nome === "escrever_arquivo") {
-          const arquivosObrigatorios = [
-            "src/calcularDesconto.js",
-            "tests/calcularDesconto.test.js",
-          ];
+    if (!arquivosObrigatorios.every((arquivo) => arquivosLidos.has(arquivo))) {
+      throw new Error(
+        "Antes de escrever, leia src/calcularDesconto.js " +
+        "e tests/calcularDesconto.test.js.",
+      );
+    }
 
-          if (
-            !arquivosObrigatorios.every((arquivo) => arquivosLidos.has(arquivo))
-          ) {
-            throw new Error(
-              "Antes de escrever, leia src/calcularDesconto.js " +
-                "e tests/calcularDesconto.test.js.",
-            );
-          }
+    if (!testesIniciaisPassaram) {
+      throw new Error(
+        "Antes da primeira escrita, execute Jest e confirme que passou.",
+      );
+    }
+  }
 
-          if (!testesIniciaisPassaram) {
-            throw new Error(
-              "Antes da primeira escrita, execute Jest e confirme que passou.",
-            );
-          }
-        }
+  const resultado = await executarFerramenta(nome, argumentos);
 
-        if (nome === "ler_arquivo") {
-          arquivosLidos.add(resultado.caminho);
-        }
+  if (nome === "ler_arquivo") {
+    arquivosLidos.add(resultado.caminho);
+  }
 
-        if (nome === "executar_testes" && escritasRealizadas === 0) {
-          testesIniciaisPassaram = resultado.passou === true;
-        }
+  if (nome === "executar_testes" && escritasRealizadas === 0) {
+    testesIniciaisPassaram = resultado.passou === true;
+  }
 
-        retorno = {
-          sucesso: true,
-          resultado,
-        };
-      } catch (erro) {
-        retorno = {
-          sucesso: false,
-          erro: erro.message,
-        };
-      }
+  if (nome === "escrever_arquivo") {
+    escritasRealizadas++;
+    console.log(`Escrita concluída: ${escritasRealizadas}/${MAXIMO_ESCRITAS}`);
+  }
+
+  retorno = {
+    sucesso: true,
+    resultado,
+  };
+} catch (erro) {
+  console.error(`Ferramenta ${nome} falhou: ${erro.message}`);
+
+  retorno = {
+    sucesso: false,
+    erro: erro.message,
+  };
+}
 
       mensagens.push({
         role: "tool",
@@ -194,6 +215,7 @@ async function main() {
       });
     }
   }
+  throw new Error("Limite de rodadas atingido sem concluir a tarefa.");
 }
 
 main().catch((erro) => {

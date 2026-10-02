@@ -46,9 +46,9 @@ function calcularAcrescimo(valor, percentual) {
 
 /**
  * Calcula o valor em centavos com desconto aplicado.
- * @param {number} precoEmCentavos - Preço em centavos (deve ser inteiro).
- * @param {number} percentual - Percentual de desconto (0 a 100).
- * @returns {number} Valor final em centavos após o desconto.
+ * @param {number} precoEmCentavos - Preço em centavos (deve ser inteiro, finito e não negativo).
+ * @param {number} percentual - Percentual de desconto (0 a 100, deve ser finito).
+ * @returns {number} Valor final em centavos após o desconto, arredondado com Math.round.
  * @throws {Error} Se o preço em centavos ou percentual forem inválidos.
  */
 function calcularDescontoEmCentavos(precoEmCentavos, percentual) {
