@@ -50,6 +50,7 @@ function calcularAcrescimo(valor, percentual) {
  * @param {number} percentual - Percentual de desconto (0 a 100, deve ser finito).
  * @returns {number} Valor final em centavos após o desconto, arredondado com Math.round.
  * @throws {Error} Se o preço em centavos ou percentual forem inválidos.
+ * @example 999 centavos com 50% de desconto retorna 500 centavos.
  */
 function calcularDescontoEmCentavos(precoEmCentavos, percentual) {
   if (!Number.isFinite(precoEmCentavos) || !Number.isFinite(percentual)) {
